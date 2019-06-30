@@ -1,0 +1,13 @@
+[Unit]
+Description=Yoda Service
+After=network.target
+
+[Service]
+ExecStart=/usr/bin/python yoda.py
+WorkingDirectory=/home/vader
+StandardOutput=inherit
+StandardError=inherit
+Restart=always
+
+[Install]
+WantedBy=multi-user.target

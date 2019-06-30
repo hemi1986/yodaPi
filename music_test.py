@@ -26,7 +26,7 @@ quoteTiming = {
     9: 4
 }
 
-mixer.init()
+mixer.init(70100)
 randomAudio = randint(1, 9);
 mixer.music.load('./sounds/' + yodaQuotes[randomAudio])
 mixer.music.play()

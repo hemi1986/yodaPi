@@ -7,8 +7,6 @@ RED_PIN = 17
 GREEN_PIN = 22
 BLUE_PIN = 24
 SENSOR_PIR_PIN = 23
-SENSOR_ULTRA_ECHO = 27
-SENSOR_ULTRA_TRIGGER = 18
 
 GPIO.setmode(GPIO.BCM)
 
@@ -20,9 +18,6 @@ GPIO.setup(BLUE_PIN, GPIO.OUT)
 PWM_FREQ_READ = GPIO.PWM(17, 50)
 PWM_FREQ_GREEN = GPIO.PWM(22, 50)
 PWM_FREQ_BLUE = GPIO.PWM(24, 50)
-
-GPIO.setup(SENSOR_ULTRA_TRIGGER, GPIO.OUT)
-GPIO.setup(SENSOR_ULTRA_ECHO, GPIO.IN)
 
 yodaQuotes = {
     1: 'amEndeHerrschaft_11.mp3',
@@ -48,48 +43,20 @@ quoteTiming = {
     9: 4
 }
 
-def getDistance():
-    # setze Trigger auf HIGH
-    GPIO.output(SENSOR_ULTRA_TRIGGER, True)
-
-    # setze Trigger nach 0.01ms aus LOW
-    time.sleep(0.00001)
-    GPIO.output(SENSOR_ULTRA_TRIGGER, False)
-
-    startTime = time.time()
-    stopTime = time.time()
-
-    # speichere Startzeit
-    while GPIO.input(SENSOR_ULTRA_ECHO) == 0:
-        startTime = time.time()
-
-    # speichere Ankunftszeit
-    while GPIO.input(SENSOR_ULTRA_ECHO) == 1:
-        stopTime = time.time()
-
-    # Zeit Differenz zwischen Start und Ankunft
-    TimeElapsed = stopTime - startTime
-    # mit der Schallgeschwindigkeit (34300 cm/s) multiplizieren
-    # und durch 2 teilen, da hin und zurueck
-    distance = (TimeElapsed * 34300) / 2
-
-    return distance
-
 def motionDetected(channel):
     print('Someone wants candy!')
     PWM_FREQ_GREEN.start(100.0)
     randomAudio = randint(1, 9)
+    mixer.music.set_volume(0.5)
     mixer.music.load('./sounds/' + yodaQuotes[randomAudio])
     mixer.music.play()
     time.sleep(quoteTiming[randomAudio])
     PWM_FREQ_GREEN.stop()
 
 try:
-    mixer.init()
+    mixer.init(70100) # i had to add strange frequency for the mp3s to play correctly on the pi. normaly they are 44100 Hz
     GPIO.add_event_detect(SENSOR_PIR_PIN, GPIO.RISING, callback=motionDetected)
     while True:
-        #distance = getDistance()
-        #print("Measured distance = %.1f cm" % distance)
         time.sleep(1)
 
 except KeyboardInterrupt:
